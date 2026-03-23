@@ -35,6 +35,10 @@
     <!-- 6. Performance Optimization -->
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" as="style">
     <link rel="preload" href="sijan.png" as="image">
+    <link rel="preload" href="sijan2.png" as="image">
+    <link rel="preload" href="sijan3.png" as="image">
+    <link rel="preload" href="sijan4.png" as="image">
+    <link rel="preload" href="sijan5.png" as="image">
 
     <!-- 7. Structured Data (JSON-LD) -->
     <script type="application/ld+json">
@@ -858,11 +862,14 @@
         <aside class="side-panel">
             <div class="infobox">
                 <div class="infobox-title">Mohammad Sijan</div>
-                <!-- Using absolute path of generated image for quick local loading -->
-                <img src="sijan.png"
-                    alt="Mohammad Sijan Image" class="infobox-image" draggable="false" oncontextmenu="return false;"
-                    style="pointer-events: none; user-select: none; -webkit-user-drag: none;"
-                    onerror="this.src='https://assets.codepen.io/1462889/cyberpunk-avatar.jpg'">
+                <!-- Dynamic Image Switcher (Desktop/Mobile) -->
+                <div class="infobox-image" style="position: relative; overflow: hidden; pointer-events: none; user-select: none; -webkit-user-drag: none;">
+                    <img src="sijan.png" alt="Sijan Image 1" class="sijan-dynamic-img" style="position: absolute; top:0; left:0; width:100%; height:100%; object-fit: cover; opacity: 1; transition: opacity 0.6s ease-in-out;">
+                    <img src="sijan2.png" alt="Sijan Image 2" class="sijan-dynamic-img" style="position: absolute; top:0; left:0; width:100%; height:100%; object-fit: cover; opacity: 0; transition: opacity 0.6s ease-in-out;">
+                    <img src="sijan3.png" alt="Sijan Image 3" class="sijan-dynamic-img" style="position: absolute; top:0; left:0; width:100%; height:100%; object-fit: cover; opacity: 0; transition: opacity 0.6s ease-in-out;">
+                    <img src="sijan4.png" alt="Sijan Image 4" class="sijan-dynamic-img" style="position: absolute; top:0; left:0; width:100%; height:100%; object-fit: cover; opacity: 0; transition: opacity 0.6s ease-in-out;">
+                    <img src="sijan5.png" alt="Sijan Image 5" class="sijan-dynamic-img" style="position: absolute; top:0; left:0; width:100%; height:100%; object-fit: cover; opacity: 0; transition: opacity 0.6s ease-in-out;">
+                </div>
 
                 <div class="info-row">
                     <span class="info-label">Born</span>
@@ -988,6 +995,98 @@
                     once: true // Play animation once per load for premium feel
                 });
             });
+
+            // --- Sijan Image Dynamic Switcher Logic ---
+            const sijanImages = document.querySelectorAll('.sijan-dynamic-img');
+            const totalImages = sijanImages.length;
+            
+            // Function to set active image index and crossfade
+            const setActiveImage = (activeIndex) => {
+                sijanImages.forEach((img, i) => {
+                    img.style.opacity = i === activeIndex ? "1" : "0";
+                });
+            };
+
+            const isMobile = () => window.innerWidth <= 767;
+
+            // --- Desktop Scroll-based Image Switch ---
+            // We use ScrollTrigger to map page scroll progress (0-1) to an image index
+            let desktopScrollTrigger = ScrollTrigger.create({
+                trigger: document.body,
+                start: "top top",
+                end: "bottom bottom",
+                onUpdate: (self) => {
+                    if (isMobile()) return; // Don't perform scroll logic on mobile
+                    
+                    const progress = self.progress; // 0 to 1
+                    let imgIndex = Math.floor(progress * totalImages);
+                    if (imgIndex >= totalImages) imgIndex = totalImages - 1; // cap at 4
+                    
+                    setActiveImage(imgIndex);
+                }
+            });
+
+            // --- Mobile Slideshow Logic ---
+            let mobileInterval;
+            let currentMobileIdx = 0;
+            
+            const startMobileSlideshow = () => {
+                if (mobileInterval) clearInterval(mobileInterval);
+                mobileInterval = setInterval(() => {
+                    currentMobileIdx = (currentMobileIdx + 1) % totalImages;
+                    setActiveImage(currentMobileIdx);
+                }, 5000); // 5 seconds
+            };
+
+            const stopMobileSlideshow = () => {
+                if (mobileInterval) {
+                    clearInterval(mobileInterval);
+                    mobileInterval = null;
+                }
+            };
+
+            // Intersection Observer to pause slideshow when section is out of view (Optimization)
+            const infoboxWrapper = document.querySelector('.infobox');
+            let isInfoboxVisible = false;
+
+            if (window.IntersectionObserver && infoboxWrapper) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        isInfoboxVisible = entry.isIntersecting;
+                        if (isMobile()) {
+                            if (isInfoboxVisible) startMobileSlideshow();
+                            else stopMobileSlideshow();
+                        }
+                    });
+                }, { threshold: 0.1 });
+                observer.observe(infoboxWrapper);
+            }
+
+            // Handle resize / orientation change to ensure behaviors don't clash
+            window.addEventListener('resize', () => {
+                if (isMobile()) {
+                    if (isInfoboxVisible && !mobileInterval) {
+                        startMobileSlideshow();
+                    }
+                } else {
+                    stopMobileSlideshow();
+                    if (desktopScrollTrigger) {
+                        // Restore correct image for desktop scroll position
+                        const progress = desktopScrollTrigger.progress;
+                        let imgIndex = Math.floor(progress * totalImages);
+                        if (imgIndex >= totalImages) imgIndex = totalImages - 1;
+                        setActiveImage(imgIndex);
+                    }
+                }
+            });
+            
+            // Initial check for mobile to run immediately
+            if (isMobile() && isInfoboxVisible) {
+                startMobileSlideshow();
+            } else if (isMobile() && !window.IntersectionObserver) {
+                // Fallback if IntersectionObserver isn't supported on mobile
+                startMobileSlideshow();
+            }
         });
     </script>
 </body>

@@ -865,12 +865,8 @@
             <div class="infobox">
                 <div class="infobox-title">Mohammad Sijan</div>
                 <!-- Dynamic Image Switcher (Desktop/Mobile) -->
-                <div class="infobox-image" style="position: relative; overflow: hidden; pointer-events: none; user-select: none; -webkit-user-drag: none;">
-                    <img src="sijan.png" alt="Sijan Image 1" class="sijan-dynamic-img" style="position: absolute; top:0; left:0; width:100%; height:100%; object-fit: cover; opacity: 1; transition: opacity 0.6s ease-in-out;">
-                    <img src="sijan2.png" alt="Sijan Image 2" class="sijan-dynamic-img" style="position: absolute; top:0; left:0; width:100%; height:100%; object-fit: cover; opacity: 0; transition: opacity 0.6s ease-in-out;">
-                    <img src="sijan3.png" alt="Sijan Image 3" class="sijan-dynamic-img" style="position: absolute; top:0; left:0; width:100%; height:100%; object-fit: cover; opacity: 0; transition: opacity 0.6s ease-in-out;">
-                    <img src="sijan4.png" alt="Sijan Image 4" class="sijan-dynamic-img" style="position: absolute; top:0; left:0; width:100%; height:100%; object-fit: cover; opacity: 0; transition: opacity 0.6s ease-in-out;">
-                    <img src="sijan5.png" alt="Sijan Image 5" class="sijan-dynamic-img" style="position: absolute; top:0; left:0; width:100%; height:100%; object-fit: cover; opacity: 0; transition: opacity 0.6s ease-in-out;">
+                <div class="infobox-image sijan-3d-section" style="position: relative; overflow: hidden; pointer-events: none; user-select: none; -webkit-user-drag: none; background: #000;">
+                    <canvas id="sijan3dCanvas" style="position: absolute; top:0; left:0; width:100%; height:100%; object-fit: cover;"></canvas>
                 </div>
 
                 <div class="info-row">
@@ -998,56 +994,150 @@
                 });
             });
 
-            // --- Sijan Image Dynamic Switcher Logic ---
-            const sijanImages = document.querySelectorAll('.sijan-dynamic-img');
-            const totalImages = sijanImages.length;
+            // --- Sijan 3D Interactive Canvas Animation ---
+            const canvas = document.getElementById('sijan3dCanvas');
+            const ctx = canvas.getContext('2d', { alpha: false });
             
-            // Function to set active image index and crossfade
-            const setActiveImage = (activeIndex) => {
-                sijanImages.forEach((img, i) => {
-                    img.style.opacity = i === activeIndex ? "1" : "0";
-                });
+            // Frame configuration
+            const frameCount = 120;
+            const images = [];
+            let loadedFrames = 0;
+            const pad = (n) => n.toString().padStart(3, '0');
+            
+            // Preload all .webp frames
+            for (let i = 0; i < frameCount; i++) {
+                const img = new Image();
+                img.src = `pics/frame_${pad(i)}_delay-0.066s.webp`;
+                img.onload = () => {
+                    loadedFrames++;
+                    // Draw first frame when ready
+                    if (loadedFrames === 1 && images[0]) {
+                        canvas.width = images[0].naturalWidth;
+                        canvas.height = images[0].naturalHeight;
+                        renderDesktopFrame(0);
+                    }
+                };
+                images.push(img);
+            }
+
+            const isMobile = () => window.innerWidth < 768;
+
+            // Render highly optimized frame on Desktop layout
+            const renderDesktopFrame = (index) => {
+                if (!images[index] || !images[index].complete) return;
+                
+                // Set fixed canvas size from intrinsic image
+                if (canvas.width !== images[index].naturalWidth) {
+                    canvas.width = images[index].naturalWidth;
+                    canvas.height = images[index].naturalHeight;
+                }
+                
+                // Slight persistent zooming effect for cinematic depth
+                const scale = 1.02; // Static zoom on desktop
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.save();
+                ctx.translate(canvas.width/2, canvas.height/2);
+                ctx.scale(scale, scale);
+                ctx.drawImage(images[index], -canvas.width/2, -canvas.height/2, canvas.width, canvas.height);
+                ctx.restore();
             };
 
-            const isMobile = () => window.innerWidth <= 767;
-
             // --- Desktop Scroll-based Image Switch ---
-            // We use ScrollTrigger to map page scroll progress (0-1) to an image index
             let desktopScrollTrigger = ScrollTrigger.create({
                 trigger: document.body,
                 start: "top top",
                 end: "bottom bottom",
                 onUpdate: (self) => {
-                    if (isMobile()) return; // Don't perform scroll logic on mobile
+                    if (isMobile() || loadedFrames < frameCount) return;
                     
-                    const progress = self.progress; // 0 to 1
-                    let imgIndex = Math.floor(progress * totalImages);
-                    if (imgIndex >= totalImages) imgIndex = totalImages - 1; // cap at 4
+                    const progress = self.progress; 
+                    let imgIndex = Math.floor(progress * frameCount);
+                    if (imgIndex >= frameCount) imgIndex = frameCount - 1; 
                     
-                    setActiveImage(imgIndex);
+                    // RequestAnimationFrame for GPU-friendly smooth painting
+                    requestAnimationFrame(() => renderDesktopFrame(imgIndex));
                 }
             });
 
-            // --- Mobile Slideshow Logic ---
-            let mobileInterval;
-            let currentMobileIdx = 0;
-            
-            const startMobileSlideshow = () => {
-                if (mobileInterval) clearInterval(mobileInterval);
-                mobileInterval = setInterval(() => {
-                    currentMobileIdx = (currentMobileIdx + 1) % totalImages;
-                    setActiveImage(currentMobileIdx);
-                }, 5000); // 5 seconds
+            // --- Mobile Slideshow Logic with WebGL-like Canvas crossfade ---
+            let mobileRafId = null;
+            let mobileStartTime = null;
+
+            const renderMobileSlideshow = (time) => {
+                if (!mobileStartTime) mobileStartTime = time;
+                const elapsed = time - mobileStartTime;
+                const duration = 2000; // Total duration per cycle (2 seconds change)
+                const fadeDuration = 600; // 0.6s smooth fade
+                
+                let curProgress = (elapsed % duration) / duration;
+                let currentIdx = Math.floor(elapsed / duration) % frameCount;
+                let nextIdx = (currentIdx + 1) % frameCount;
+
+                // Stop rendering if images missing
+                if (!images[currentIdx]?.complete || !images[nextIdx]?.complete) {
+                    mobileRafId = requestAnimationFrame(renderMobileSlideshow);
+                    return;
+                }
+
+                if (canvas.width !== images[currentIdx].naturalWidth) {
+                    canvas.width = images[currentIdx].naturalWidth;
+                    canvas.height = images[currentIdx].naturalHeight;
+                }
+
+                // Smooth scale effect (Ken Burns)
+                const scaleCur = 1 + (0.05 * curProgress);
+                
+                let fadeAlpha = 0;
+                let fadeProgress = 0;
+                // Compute crossfade at the end of the 2-second cycle
+                if (elapsed % duration >= (duration - fadeDuration)) {
+                    fadeProgress = (elapsed % duration - (duration - fadeDuration)) / fadeDuration;
+                    fadeAlpha = easeInOutQuad(fadeProgress);
+                }
+
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Draw Base (Current Frame) fading out
+                ctx.save();
+                ctx.translate(canvas.width/2, canvas.height/2);
+                ctx.scale(scaleCur, scaleCur);
+                ctx.globalAlpha = 1 - fadeAlpha;
+                ctx.drawImage(images[currentIdx], -canvas.width/2, -canvas.height/2, canvas.width, canvas.height);
+                ctx.restore();
+
+                // Draw Overlay (Next Frame) fading in
+                if (fadeAlpha > 0) {
+                    ctx.save();
+                    ctx.translate(canvas.width/2, canvas.height/2);
+                    // Match scale for smooth transition
+                    const scaleNext = 1 + (0.05 * (fadeProgress * (fadeDuration/duration)));
+                    ctx.scale(scaleNext, scaleNext);
+                    ctx.globalAlpha = fadeAlpha;
+                    ctx.drawImage(images[nextIdx], -canvas.width/2, -canvas.height/2, canvas.width, canvas.height);
+                    ctx.restore();
+                }
+
+                mobileRafId = requestAnimationFrame(renderMobileSlideshow);
             };
 
-            const stopMobileSlideshow = () => {
-                if (mobileInterval) {
-                    clearInterval(mobileInterval);
-                    mobileInterval = null;
+            const easeInOutQuad = t => t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+
+            const startMobileSlideshow = () => {
+                if (!mobileRafId) {
+                    mobileStartTime = null; 
+                    mobileRafId = requestAnimationFrame(renderMobileSlideshow);
                 }
             };
 
-            // Intersection Observer to pause slideshow when section is out of view (Optimization)
+            const stopMobileSlideshow = () => {
+                if (mobileRafId) {
+                    cancelAnimationFrame(mobileRafId);
+                    mobileRafId = null;
+                }
+            };
+
+            // Intersection Observer to Pause Animation
             const infoboxWrapper = document.querySelector('.infobox');
             let isInfoboxVisible = false;
 
@@ -1064,29 +1154,22 @@
                 observer.observe(infoboxWrapper);
             }
 
-            // Handle resize / orientation change to ensure behaviors don't clash
+            // Global handling
             window.addEventListener('resize', () => {
                 if (isMobile()) {
-                    if (isInfoboxVisible && !mobileInterval) {
-                        startMobileSlideshow();
-                    }
+                    if (isInfoboxVisible && !mobileRafId) startMobileSlideshow();
                 } else {
                     stopMobileSlideshow();
                     if (desktopScrollTrigger) {
-                        // Restore correct image for desktop scroll position
                         const progress = desktopScrollTrigger.progress;
-                        let imgIndex = Math.floor(progress * totalImages);
-                        if (imgIndex >= totalImages) imgIndex = totalImages - 1;
-                        setActiveImage(imgIndex);
+                        let imgIndex = Math.floor(progress * frameCount);
+                        if (imgIndex >= frameCount) imgIndex = frameCount - 1;
+                        requestAnimationFrame(() => renderDesktopFrame(imgIndex));
                     }
                 }
             });
             
-            // Initial check for mobile to run immediately
-            if (isMobile() && isInfoboxVisible) {
-                startMobileSlideshow();
-            } else if (isMobile() && !window.IntersectionObserver) {
-                // Fallback if IntersectionObserver isn't supported on mobile
+            if (isMobile() && (!window.IntersectionObserver || isInfoboxVisible)) {
                 startMobileSlideshow();
             }
         });

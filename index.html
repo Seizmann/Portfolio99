@@ -214,35 +214,6 @@
             width: 100%;
         }
 
-        .search-container {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .search-container input {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            padding: 0.5rem 1rem 0.5rem 2.5rem;
-            border-radius: 20px;
-            color: white;
-            font-family: var(--font-main);
-            outline: none;
-            transition: all 0.3s ease;
-            width: 250px;
-        }
-
-        .search-container input:focus {
-            border-color: var(--accent-cyan);
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
-            width: 300px;
-        }
-
-        .search-container i {
-            position: absolute;
-            left: 1rem;
-            color: var(--text-muted);
-        }
 
         /* Container Layout */
         .container {
@@ -819,10 +790,6 @@
                 display: flex;
             }
 
-            .search-container {
-                display: none;
-            }
-
             h1 {
                 font-size: 3rem;
             }
@@ -856,10 +823,6 @@
             <li><a href="#timeline">Timeline</a></li>
             <li><a href="gallery/">Gallery</a></li>
         </ul>
-        <div class="search-container">
-            <i class="fas fa-search"></i>
-            <input type="text" id="search-input" placeholder="Search..." aria-label="Search">
-        </div>
         <button class="nav-hamburger" id="nav-hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav-menu">
             <span class="bar"></span>
             <span class="bar"></span>

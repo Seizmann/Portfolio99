@@ -633,7 +633,173 @@
             color: var(--accent-cyan);
         }
 
-        /* Responsive */
+        /* ============================================================
+           HAMBURGER BUTTON
+           ============================================================ */
+        .nav-hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            gap: 5px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 6px;
+            z-index: 1002;
+            position: relative;
+        }
+
+        .nav-hamburger .bar {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: var(--text-main);
+            border-radius: 2px;
+            transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                        opacity 0.25s ease,
+                        width 0.3s ease;
+            transform-origin: center;
+        }
+
+        /* Animated X state */
+        .nav-hamburger.open .bar:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+        .nav-hamburger.open .bar:nth-child(2) {
+            opacity: 0;
+            width: 0;
+        }
+        .nav-hamburger.open .bar:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        /* ============================================================
+           MOBILE NAV MENU
+           ============================================================ */
+        .mobile-nav-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            background: rgba(5, 5, 8, 0.97);
+            backdrop-filter: blur(24px) saturate(160%);
+            -webkit-backdrop-filter: blur(24px) saturate(160%);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            /* closed state */
+            max-height: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition:
+                max-height 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                opacity 0.3s ease;
+        }
+
+        .mobile-nav-menu.open {
+            max-height: 500px;
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* Spacer so links clear the fixed navbar */
+        .mobile-nav-spacer {
+            height: 68px;
+            flex-shrink: 0;
+        }
+
+        .mobile-nav-menu a {
+            display: flex;
+            align-items: center;
+            gap: 0.9rem;
+            padding: 1rem 2rem;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid var(--glass-border);
+            transition:
+                background 0.25s ease,
+                color 0.25s ease,
+                padding-left 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mobile-nav-menu a:last-child {
+            border-bottom: none;
+        }
+
+        .mobile-nav-menu a i {
+            width: 20px;
+            text-align: center;
+            color: var(--accent-cyan);
+            font-size: 0.9rem;
+            transition: transform 0.25s ease;
+        }
+
+        .mobile-nav-menu a:hover,
+        .mobile-nav-menu a.active {
+            background: rgba(0, 240, 255, 0.05);
+            color: var(--accent-cyan);
+            padding-left: 2.5rem;
+        }
+
+        .mobile-nav-menu a:hover i,
+        .mobile-nav-menu a.active i {
+            transform: scale(1.2);
+        }
+
+        /* Accent bar on left on active */
+        .mobile-nav-menu a.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 0 2px 2px 0;
+        }
+
+        /* Bottom close bar */
+        .mobile-nav-close-bar {
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            font-family: var(--font-mono);
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        .mobile-nav-close-bar:hover { color: var(--accent-cyan); }
+
+        /* Backdrop overlay */
+        #mobile-nav-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 998;
+            background: rgba(0, 0, 0, 0);
+            pointer-events: none;
+            transition: background 0.35s ease;
+        }
+        #mobile-nav-backdrop.active {
+            background: rgba(0, 0, 0, 0.5);
+            pointer-events: all;
+        }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
         @media (max-width: 900px) {
             .container {
                 grid-template-columns: 1fr;
@@ -643,16 +809,18 @@
                 position: relative;
                 top: 0;
                 order: -1;
-                /* move infobox to top */
             }
 
             .nav-links {
                 display: none;
-                /* simple mobile nav for now */
             }
 
-            .search-container input {
-                width: 150px;
+            .nav-hamburger {
+                display: flex;
+            }
+
+            .search-container {
+                display: none;
             }
 
             h1 {
@@ -679,14 +847,50 @@
     <div id="bg-vignette" aria-hidden="true"></div>
     <div id="cursor-glow" aria-hidden="true"></div>
 
-    <nav>
+    <nav id="main-nav">
         <div class="navtext">SIJAN.PRO.BD</div>
         <ul class="nav-links">
             <li><a href="#about" class="active">Article</a></li>
             <li><a href="#skills">Skills</a></li>
             <li><a href="#projects">Projects</a></li>
             <li><a href="#timeline">Timeline</a></li>
+            <li><a href="gallery/">Gallery</a></li>
         </ul>
+        <div class="search-container">
+            <i class="fas fa-search"></i>
+            <input type="text" id="search-input" placeholder="Search..." aria-label="Search">
+        </div>
+        <button class="nav-hamburger" id="nav-hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav-menu">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </button>
+    </nav>
+
+    <!-- Mobile backdrop -->
+    <div id="mobile-nav-backdrop" aria-hidden="true"></div>
+
+    <!-- Mobile Navigation Menu -->
+    <nav id="mobile-nav-menu" class="mobile-nav-menu" aria-label="Mobile navigation">
+        <div class="mobile-nav-spacer"></div>
+        <a href="#about" class="active" data-mobile-link>
+            <i class="fas fa-user"></i> Article
+        </a>
+        <a href="#skills" data-mobile-link>
+            <i class="fas fa-code"></i> Skills
+        </a>
+        <a href="#projects" data-mobile-link>
+            <i class="fas fa-folder-open"></i> Projects
+        </a>
+        <a href="#timeline" data-mobile-link>
+            <i class="fas fa-clock-rotate-left"></i> Timeline
+        </a>
+        <a href="gallery/" data-mobile-link>
+            <i class="fas fa-images"></i> Gallery
+        </a>
+        <div class="mobile-nav-close-bar" id="mobile-nav-close-bar" role="button" tabindex="0" aria-label="Close menu">
+            <i class="fas fa-chevron-up"></i> Close Menu
+        </div>
     </nav>
 
     <div class="container">
@@ -2035,6 +2239,75 @@
         // ── Kick off the first auto-run ───────────────────────────────
         scheduleNext();
 
+    })();
+
+    /* ================================================================
+       MOBILE HAMBURGER MENU
+       ================================================================ */
+    (function () {
+        const hamburger   = document.getElementById('nav-hamburger');
+        const mobileMenu  = document.getElementById('mobile-nav-menu');
+        const backdrop    = document.getElementById('mobile-nav-backdrop');
+        const closeBar    = document.getElementById('mobile-nav-close-bar');
+        const mobileLinks = document.querySelectorAll('[data-mobile-link]');
+
+        function openMenu() {
+            mobileMenu.classList.add('open');
+            backdrop.classList.add('active');
+            hamburger.classList.add('open');
+            hamburger.setAttribute('aria-expanded', 'true');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMenu() {
+            mobileMenu.classList.remove('open');
+            backdrop.classList.remove('active');
+            hamburger.classList.remove('open');
+            hamburger.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+        }
+
+        hamburger.addEventListener('click', () => {
+            mobileMenu.classList.contains('open') ? closeMenu() : openMenu();
+        });
+
+        // Close when a link is clicked
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                closeMenu();
+                // Update active state
+                mobileLinks.forEach(l => l.classList.remove('active'));
+                if (link.getAttribute('href').startsWith('#')) link.classList.add('active');
+            });
+        });
+
+        // Close via close bar
+        closeBar.addEventListener('click', closeMenu);
+        closeBar.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); closeMenu(); }
+        });
+
+        // Close via backdrop click
+        backdrop.addEventListener('click', closeMenu);
+
+        // Close on Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && mobileMenu.classList.contains('open')) closeMenu();
+        });
+
+        // Sync active link with scroll sections
+        const sections = document.querySelectorAll('section[id]');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    mobileLinks.forEach(l => {
+                        l.classList.toggle('active', l.getAttribute('href') === '#' + id);
+                    });
+                }
+            });
+        }, { threshold: 0.4 });
+        sections.forEach(s => observer.observe(s));
     })();
     </script>
 

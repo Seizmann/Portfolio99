@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO -->
+    <title>Photo Gallery | Mohammad Sijan</title>
+    <meta name="description" content="Explore the photo gallery of Mohammad Sijan — a curated collection of premium photos in an iPhone-inspired gallery experience.">
+    <meta name="author" content="Mohammad Sijan">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Photo Gallery | Mohammad Sijan">
+    <meta property="og:description" content="Premium photo gallery of Mohammad Sijan.">
+    <meta property="og:url" content="https://sijan.pro.bd/gallery">
+    <meta property="og:image" content="/preview.png">
+    <link rel="canonical" href="https://sijan.pro.bd/gallery">
+    <link rel="icon" type="image/png" href="../favicon.png">
+    <meta name="theme-color" content="#0a0a0a">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* ============================================================
+           DESIGN TOKENS
+           ============================================================ */
+        :root {
+            --bg-dark: #050508;
+            --accent-cyan: #00f0ff;
+            --accent-purple: #9d00ff;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --font-main: 'Outfit', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --thumb-radius: 14px;
+            --gap: 6px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ============================================================
+           ANIMATED BG GRADIENT (subtle)
+           ============================================================ */
+        #bg-glow {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse 60% 40% at 20% 10%, rgba(0,240,255,0.06) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 50% at 80% 80%, rgba(157,0,255,0.07) 0%, transparent 70%);
+            animation: bgPulse 8s ease-in-out infinite alternate;
+        }
+        @keyframes bgPulse {
+            0%   { opacity: 0.6; }
+            100% { opacity: 1;   }
+        }
+
+        /* ============================================================
+           NAVBAR
+           ============================================================ */
+        nav {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(5, 5, 8, 0.80);
+            backdrop-filter: blur(18px) saturate(160%);
+            -webkit-backdrop-filter: blur(18px) saturate(160%);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .navtext {
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0%;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background: var(--accent-cyan);
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px var(--accent-cyan);
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after { width: 100%; }
+
+        /* ============================================================
+           HAMBURGER BUTTON
+           ============================================================ */
+        .nav-hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            gap: 5px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 6px;
+            z-index: 1002;
+            position: relative;
+        }
+
+        .nav-hamburger .bar {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: var(--text-main);
+            border-radius: 2px;
+            transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                        opacity 0.25s ease,
+                        width 0.3s ease;
+            transform-origin: center;
+        }
+
+        /* Animated X state */
+        .nav-hamburger.open .bar:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+        .nav-hamburger.open .bar:nth-child(2) {
+            opacity: 0;
+            width: 0;
+        }
+        .nav-hamburger.open .bar:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        /* ============================================================
+           PAGE CONTENT
+           ============================================================ */
+        .page-wrapper {
+            position: relative;
+            z-index: 10;
+            padding-top: 90px;
+            padding-bottom: 80px;
+            min-height: 100vh;
+        }
+
+        .gallery-header {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem 1.5rem;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .gallery-header-left h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 30%, var(--text-muted));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.1;
+            margin-bottom: 0.3rem;
+        }
+
+        .gallery-header-left p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            font-family: var(--font-mono);
+        }
+
+        /* Photo count badge */
+        .photo-count-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.45rem 1.1rem;
+            border-radius: 30px;
+            background: rgba(0,240,255,0.07);
+            border: 1px solid rgba(0,240,255,0.2);
+            color: var(--accent-cyan);
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: var(--font-mono);
+            letter-spacing: 0.5px;
+        }
+
+        /* ============================================================
+           MASONRY / GRID
+           ============================================================ */
+        .gallery-grid-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .gallery-grid {
+            column-count: 4;
+            column-gap: var(--gap);
+        }
+
+        .gallery-item {
+            break-inside: avoid;
+            margin-bottom: var(--gap);
+            border-radius: var(--thumb-radius);
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            background: rgba(255,255,255,0.04);
+            /* skeleton shimmer before load */
+        }
+
+        .gallery-item::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg,
+                rgba(255,255,255,0.03) 25%,
+                rgba(255,255,255,0.07) 50%,
+                rgba(255,255,255,0.03) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            z-index: 1;
+            transition: opacity 0.4s;
+        }
+        .gallery-item.loaded::before { opacity: 0; pointer-events: none; }
+
+        @keyframes shimmer {
+            0%   { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .gallery-item img {
+            display: block;
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+            border-radius: var(--thumb-radius);
+            opacity: 0;
+            transition:
+                opacity 0.5s ease,
+                transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                box-shadow 0.45s ease;
+            will-change: transform, opacity;
+        }
+
+        .gallery-item.loaded img {
+            opacity: 1;
+        }
+
+        /* Hover effects */
+        .gallery-item:hover img {
+            transform: scale(1.03);
+            box-shadow:
+                0 0 0 2px rgba(0,240,255,0.35),
+                0 12px 40px rgba(0,240,255,0.18),
+                0 4px 16px rgba(0,0,0,0.6);
+        }
+
+        /* Overlay on hover */
+        .gallery-item-overlay {
+            position: absolute;
+            inset: 0;
+            border-radius: var(--thumb-radius);
+            background: linear-gradient(
+                to bottom,
+                transparent 50%,
+                rgba(0,0,0,0.55) 100%
+            );
+            opacity: 0;
+            transition: opacity 0.35s ease;
+            z-index: 2;
+            display: flex;
+            align-items: flex-end;
+            padding: 1rem;
+        }
+
+        .gallery-item:hover .gallery-item-overlay {
+            opacity: 1;
+        }
+
+        .overlay-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(8px);
+            color: #fff;
+            font-size: 0.9rem;
+            margin-left: auto;
+        }
+
+        /* ============================================================
+           EMPTY STATE
+           ============================================================ */
+        .empty-state {
+            text-align: center;
+            padding: 5rem 2rem;
+            color: var(--text-muted);
+        }
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.4;
+        }
+        .empty-state p { font-size: 1.1rem; }
+
+        /* ============================================================
+           LIGHTBOX
+           ============================================================ */
+        #lightbox {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0);
+            backdrop-filter: blur(0px);
+            -webkit-backdrop-filter: blur(0px);
+            pointer-events: none;
+            visibility: hidden;
+            transition:
+                background 0.4s ease,
+                backdrop-filter 0.4s ease,
+                visibility 0s linear 0.4s;
+        }
+
+        #lightbox.open {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(24px) saturate(150%);
+            -webkit-backdrop-filter: blur(24px) saturate(150%);
+            pointer-events: all;
+            visibility: visible;
+            transition:
+                background 0.4s ease,
+                backdrop-filter 0.4s ease,
+                visibility 0s linear 0s;
+        }
+
+        .lightbox-inner {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            padding: 80px 80px;
+        }
+
+        /* The image display */
+        #lightbox-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 16px;
+            box-shadow: 0 30px 100px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.06);
+            opacity: 0;
+            transform: scale(0.88);
+            transition:
+                opacity 0.38s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                transform 0.38s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            will-change: transform, opacity;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        #lightbox.open #lightbox-img {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Transition states for prev/next */
+        #lightbox-img.exit-left  { opacity: 0; transform: scale(0.9) translateX(-60px); }
+        #lightbox-img.exit-right { opacity: 0; transform: scale(0.9) translateX(60px);  }
+        #lightbox-img.enter-left  { opacity: 0; transform: scale(0.9) translateX(60px);  }
+        #lightbox-img.enter-right { opacity: 0; transform: scale(0.9) translateX(-60px); }
+
+        /* Lightbox Controls */
+        .lb-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.12);
+            backdrop-filter: blur(12px);
+            color: #fff;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.25s ease;
+            z-index: 10001;
+        }
+        .lb-btn:hover {
+            background: rgba(0,240,255,0.15);
+            border-color: rgba(0,240,255,0.4);
+            box-shadow: 0 0 20px rgba(0,240,255,0.25);
+            transform: translateY(-50%) scale(1.1);
+        }
+        #lb-prev { left: 20px; }
+        #lb-next { right: 20px; }
+
+        /* Close button */
+        #lb-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            backdrop-filter: blur(12px);
+            color: #fff;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.25s ease;
+            z-index: 10001;
+        }
+        #lb-close:hover {
+            background: rgba(255, 80, 80, 0.2);
+            border-color: rgba(255, 80, 80, 0.5);
+            box-shadow: 0 0 20px rgba(255, 80, 80, 0.2);
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        /* Counter */
+        #lb-counter {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 30px;
+            padding: 0.45rem 1.2rem;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.75);
+            letter-spacing: 1px;
+            z-index: 10001;
+            white-space: nowrap;
+        }
+
+        /* Thumbnails strip at bottom of lightbox */
+        #lb-thumbnails {
+            position: absolute;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 10001;
+            padding: 6px;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.07);
+            max-width: 90vw;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        #lb-thumbnails::-webkit-scrollbar { display: none; }
+
+        .lb-thumb {
+            width: 52px;
+            height: 52px;
+            border-radius: 8px;
+            object-fit: cover;
+            cursor: pointer;
+            opacity: 0.5;
+            border: 2px solid transparent;
+            transition: all 0.25s ease;
+            flex-shrink: 0;
+        }
+        .lb-thumb:hover { opacity: 0.8; }
+        .lb-thumb.active {
+            opacity: 1;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 12px rgba(0,240,255,0.4);
+        }
+
+        /* ============================================================
+           LOADING INDICATOR (top bar)
+           ============================================================ */
+        #load-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 2px;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            z-index: 99999;
+            transition: width 0.4s ease, opacity 0.6s ease;
+            box-shadow: 0 0 12px var(--accent-cyan);
+        }
+
+        /* ============================================================
+           FOOTER
+           ============================================================ */
+        .gallery-footer {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-family: var(--font-mono);
+            position: relative;
+            z-index: 10;
+        }
+        .gallery-footer a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+        }
+        .gallery-footer a:hover { text-decoration: underline; }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 1100px) { .gallery-grid { column-count: 3; } }
+        @media (max-width: 750px)  { .gallery-grid { column-count: 2; } }
+        @media (max-width: 480px)  {
+            .gallery-grid { column-count: 2; --gap: 4px; }
+            .gallery-header-left h1 { font-size: 2rem; }
+            .lightbox-inner { padding: 60px 14px; }
+            #lb-prev { left: 6px; }
+            #lb-next { right: 6px; }
+            .lb-btn { width: 42px; height: 42px; font-size: 1rem; }
+        }
+
+        @media (max-width: 900px) {
+            .nav-links { display: none; }
+            .nav-hamburger { display: flex; }
+        }
+
+        /* Touch swipe indicator (mobile hint) */
+        .swipe-hint {
+            display: none;
+            position: absolute;
+            bottom: 130px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.4);
+            font-size: 0.78rem;
+            font-family: var(--font-mono);
+            letter-spacing: 0.5px;
+            animation: fadeHint 3s ease 1s forwards;
+            z-index: 10001;
+            white-space: nowrap;
+        }
+        @media (max-width: 600px) { .swipe-hint { display: block; } }
+        @keyframes fadeHint {
+            0%   { opacity: 1; }
+            70%  { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* ============================================================
+           MOBILE NAV MENU
+           ============================================================ */
+        .mobile-nav-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            background: rgba(5, 5, 8, 0.97);
+            backdrop-filter: blur(24px) saturate(160%);
+            -webkit-backdrop-filter: blur(24px) saturate(160%);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            /* Closed state */
+            max-height: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition:
+                max-height 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                opacity 0.3s ease;
+        }
+
+        .mobile-nav-menu.open {
+            max-height: 500px;
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* Spacer so links clear the fixed navbar */
+        .mobile-nav-spacer {
+            height: 68px;
+            flex-shrink: 0;
+        }
+
+        .mobile-nav-menu a {
+            display: flex;
+            align-items: center;
+            gap: 0.9rem;
+            padding: 1rem 2rem;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid var(--glass-border);
+            transition:
+                background 0.25s ease,
+                color 0.25s ease,
+                padding-left 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mobile-nav-menu a:last-of-type {
+            border-bottom: none;
+        }
+
+        .mobile-nav-menu a i {
+            width: 20px;
+            text-align: center;
+            color: var(--accent-cyan);
+            font-size: 0.9rem;
+            transition: transform 0.25s ease;
+            flex-shrink: 0;
+        }
+
+        .mobile-nav-menu a:hover,
+        .mobile-nav-menu a.active {
+            background: rgba(0, 240, 255, 0.05);
+            color: var(--accent-cyan);
+            padding-left: 2.5rem;
+        }
+
+        .mobile-nav-menu a:hover i,
+        .mobile-nav-menu a.active i {
+            transform: scale(1.2);
+        }
+
+        /* Accent left bar for active link */
+        .mobile-nav-menu a.active::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 0 2px 2px 0;
+        }
+
+        /* Close bar at the bottom */
+        .mobile-nav-close-bar {
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            font-family: var(--font-mono);
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        .mobile-nav-close-bar:hover { color: var(--accent-cyan); }
+
+        /* Backdrop overlay */
+        #mobile-nav-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 998;
+            background: rgba(0, 0, 0, 0);
+            pointer-events: none;
+            transition: background 0.35s ease;
+        }
+        #mobile-nav-backdrop.active {
+            background: rgba(0, 0, 0, 0.5);
+            pointer-events: all;
+        }
+
+        /* Appear animation for grid items */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .gallery-item {
+            animation: fadeInUp 0.5s ease both;
+        }
+
+        /* ============================================================
+           DOWNLOAD / SAVE PROTECTION
+           ============================================================ */
+        /* Disable selection everywhere */
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+        /* Block image drag */
+        img {
+            -webkit-user-drag: none;
+            pointer-events: none;
+        }
+        /* Transparent shield overlay ON TOP of every grid image */
+        .img-shield {
+            position: absolute;
+            inset: 0;
+            z-index: 3;
+            cursor: pointer;
+        }
+        /* Lightbox image shield */
+        #lb-img-shield {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            cursor: default;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Loading Bar -->
+    <div id="load-bar"></div>
+
+    <!-- Subtle BG Glow -->
+    <div id="bg-glow" aria-hidden="true"></div>
+
+    <!-- ================================================================
+         NAVBAR
+         ================================================================ -->
+    <nav id="main-nav" aria-label="Main navigation">
+        <a href="../" class="navtext" aria-label="Home">SIJAN.PRO.BD</a>
+        <ul class="nav-links" role="list">
+            <li><a href="../#about">Article</a></li>
+            <li><a href="../#skills">Skills</a></li>
+            <li><a href="../#projects">Projects</a></li>
+            <li><a href="../#timeline">Timeline</a></li>
+            <li><a href="./" class="active">Gallery</a></li>
+        </ul>
+        <button class="nav-hamburger" id="nav-hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav-menu">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </button>
+    </nav>
+
+    <!-- Mobile Backdrop -->
+    <div id="mobile-nav-backdrop" aria-hidden="true"></div>
+
+    <!-- Mobile Navigation Menu -->
+    <nav id="mobile-nav-menu" class="mobile-nav-menu" aria-label="Mobile navigation">
+        <div class="mobile-nav-spacer"></div>
+        <a href="../#about">
+            <i class="fas fa-user"></i> Article
+        </a>
+        <a href="../#skills">
+            <i class="fas fa-code"></i> Skills
+        </a>
+        <a href="../#projects">
+            <i class="fas fa-folder-open"></i> Projects
+        </a>
+        <a href="../#timeline">
+            <i class="fas fa-clock-rotate-left"></i> Timeline
+        </a>
+        <a href="./" class="active">
+            <i class="fas fa-images"></i> Gallery
+        </a>
+        <div class="mobile-nav-close-bar" id="mobile-nav-close-bar" role="button" tabindex="0" aria-label="Close menu">
+            <i class="fas fa-chevron-up"></i> Close Menu
+        </div>
+    </nav>
+
+    <!-- ================================================================
+         PAGE CONTENT
+         ================================================================ -->
+    <div class="page-wrapper">
+
+        <!-- Gallery Header -->
+        <header class="gallery-header">
+            <div class="gallery-header-left">
+                <h1><i class="fas fa-images" style="font-size:0.85em;background:linear-gradient(135deg,var(--accent-cyan),var(--accent-purple));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-right:0.3em;"></i>Photo Gallery</h1>
+                <p id="gallery-subtitle">Loading photos...</p>
+            </div>
+            <div id="gallery-count-badge" class="photo-count-badge" style="display:none;">
+                <i class="fas fa-photo-film"></i>
+                <span id="photo-count-text">— Photos</span>
+            </div>
+        </header>
+
+        <!-- Grid -->
+        <div class="gallery-grid-container">
+            <div class="gallery-grid" id="gallery-grid" role="list" aria-label="Photo gallery">
+                <!-- Populated by JS -->
+            </div>
+            <div class="empty-state" id="empty-state" style="display:none;">
+                <i class="fas fa-image"></i>
+                <p>No photos found in /gallery/Photos/</p>
+                <p style="font-size:0.85rem;margin-top:0.5rem;">Add images to the folder and refresh.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ================================================================
+         LIGHTBOX
+         ================================================================ -->
+    <div id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer">
+        <button id="lb-close" aria-label="Close viewer"><i class="fas fa-xmark"></i></button>
+        <button class="lb-btn" id="lb-prev" aria-label="Previous image"><i class="fas fa-chevron-left"></i></button>
+        <div class="lightbox-inner">
+            <img id="lightbox-img" src="" alt="Gallery photo" draggable="false">
+            <!-- Transparent shield to block right-click / drag on lightbox image -->
+            <div id="lb-img-shield" aria-hidden="true"></div>
+        </div>
+        <button class="lb-btn" id="lb-next" aria-label="Next image"><i class="fas fa-chevron-right"></i></button>
+        <div id="lb-thumbnails" role="list" aria-label="Thumbnail navigation"></div>
+        <div id="lb-counter" aria-live="polite">1 / 1</div>
+        <div class="swipe-hint">← Swipe to navigate →</div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="gallery-footer">
+        <a href="../">← Back to Portfolio</a> &nbsp;·&nbsp; Mohammad Sijan &copy; 2025
+    </footer>
+
+    <!-- ================================================================
+         JAVASCRIPT
+         ================================================================ -->
+    <script>
+    (function () {
+        'use strict';
+
+        /* ----------------------------------------------------------------
+           CONFIG — add/remove image filenames here as you add to /gallery/Photos/
+           The page auto-discovers these via the array below.
+           To fully automate, a server-side solution is needed;
+           for a static site we maintain this manifest.
+        ---------------------------------------------------------------- */
+        const PHOTOS_DIR = 'Photos/';
+        const PHOTO_FILES = [
+            'image.png',
+            'image2.png',
+            'image3.png',
+            'image4.png',
+            'image5.png',
+            'image6.png',
+            'image7.png',
+            'image8.png',
+            'image9.png',
+            'image10.png',
+            'image11.png',
+            'image12.png',
+        ].filter(Boolean);
+
+        /* ----------------------------------------------------------------
+           STATE
+        ---------------------------------------------------------------- */
+        let currentIndex = 0;
+        let lightboxOpen = false;
+        let isAnimating  = false;
+
+        /* ----------------------------------------------------------------
+           DOM REFS
+        ---------------------------------------------------------------- */
+        const grid       = document.getElementById('gallery-grid');
+        const emptyState = document.getElementById('empty-state');
+        const subtitle   = document.getElementById('gallery-subtitle');
+        const countBadge = document.getElementById('gallery-count-badge');
+        const countText  = document.getElementById('photo-count-text');
+        const loadBar    = document.getElementById('load-bar');
+        const lightbox   = document.getElementById('lightbox');
+        const lbImg      = document.getElementById('lightbox-img');
+        const lbPrev     = document.getElementById('lb-prev');
+        const lbNext     = document.getElementById('lb-next');
+        const lbClose    = document.getElementById('lb-close');
+        const lbCounter  = document.getElementById('lb-counter');
+        const lbThumbs   = document.getElementById('lb-thumbnails');
+
+        /* ----------------------------------------------------------------
+           LOADING BAR
+        ---------------------------------------------------------------- */
+        let loadedCount = 0;
+        const total = PHOTO_FILES.length;
+
+        function updateLoadBar() {
+            loadedCount++;
+            const pct = (loadedCount / total) * 100;
+            loadBar.style.width = pct + '%';
+            if (loadedCount >= total) {
+                setTimeout(() => { loadBar.style.opacity = '0'; }, 600);
+            }
+        }
+
+        /* ----------------------------------------------------------------
+           BUILD GRID
+        ---------------------------------------------------------------- */
+        function buildGallery() {
+            if (!PHOTO_FILES.length) {
+                emptyState.style.display = 'block';
+                subtitle.textContent = 'No photos found.';
+                loadBar.style.opacity = '0';
+                return;
+            }
+
+            subtitle.textContent = `${total} photo${total !== 1 ? 's' : ''} · Tap to view`;
+            countText.textContent = `${total} Photo${total !== 1 ? 's' : ''}`;
+            countBadge.style.display = 'inline-flex';
+
+            PHOTO_FILES.forEach((file, i) => {
+                const item = document.createElement('div');
+                item.className = 'gallery-item';
+                item.style.animationDelay = `${i * 60}ms`;
+                item.setAttribute('role', 'listitem');
+                item.setAttribute('tabindex', '0');
+                item.setAttribute('aria-label', `Photo ${i + 1}`);
+
+                const img = document.createElement('img');
+                img.loading = 'lazy';
+                img.decoding = 'async';
+                img.alt = `Gallery photo ${i + 1}`;
+                img.src = PHOTOS_DIR + file;
+
+                img.addEventListener('load', () => {
+                    item.classList.add('loaded');
+                    updateLoadBar();
+                });
+                img.addEventListener('error', () => {
+                    item.style.display = 'none';
+                    updateLoadBar();
+                });
+
+                const overlay = document.createElement('div');
+                overlay.className = 'gallery-item-overlay';
+                overlay.innerHTML = '<div class="overlay-icon"><i class="fas fa-expand"></i></div>';
+
+                item.appendChild(img);
+                item.appendChild(overlay);
+                // Transparent click-shield on top — captures click, blocks right-click on image
+                const shield = document.createElement('div');
+                shield.className = 'img-shield';
+                shield.setAttribute('aria-hidden', 'true');
+                item.appendChild(shield);
+
+                item.addEventListener('click', () => openLightbox(i));
+                item.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        openLightbox(i);
+                    }
+                });
+
+                grid.appendChild(item);
+            });
+
+            // Build lightbox thumbnails
+            buildLbThumbs();
+        }
+
+        function buildLbThumbs() {
+            lbThumbs.innerHTML = '';
+            PHOTO_FILES.forEach((file, i) => {
+                const thumb = document.createElement('img');
+                thumb.src = PHOTOS_DIR + file;
+                thumb.alt = `Thumbnail ${i + 1}`;
+                thumb.className = 'lb-thumb';
+                thumb.loading = 'lazy';
+                thumb.setAttribute('role', 'listitem');
+                thumb.setAttribute('tabindex', '0');
+                if (i === 0) thumb.classList.add('active');
+                thumb.addEventListener('click', () => {
+                    if (currentIndex !== i) navigateTo(i);
+                });
+                lbThumbs.appendChild(thumb);
+            });
+        }
+
+        /* ----------------------------------------------------------------
+           LIGHTBOX
+        ---------------------------------------------------------------- */
+        function openLightbox(index) {
+            currentIndex = index;
+            lbImg.src = PHOTOS_DIR + PHOTO_FILES[index];
+            lbImg.alt = `Gallery photo ${index + 1}`;
+            updateCounter();
+            updateThumbActive();
+            lightbox.classList.add('open');
+            lightboxOpen = true;
+            document.body.style.overflow = 'hidden';
+            // Preload adjacent
+            preload(index - 1);
+            preload(index + 1);
+            // Scroll thumb into view
+            scrollThumbIntoView(index);
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('open');
+            lightboxOpen = false;
+            document.body.style.overflow = '';
+        }
+
+        function navigateTo(newIndex, direction) {
+            if (isAnimating) return;
+            if (newIndex < 0 || newIndex >= PHOTO_FILES.length) return;
+
+            isAnimating = true;
+
+            const exitClass  = direction === 'prev' ? 'exit-right' : 'exit-left';
+            const enterClass = direction === 'prev' ? 'enter-right' : 'enter-left';
+
+            lbImg.classList.add(exitClass);
+
+            setTimeout(() => {
+                lbImg.classList.remove(exitClass);
+                lbImg.classList.add(enterClass);
+                lbImg.src = PHOTOS_DIR + PHOTO_FILES[newIndex];
+                lbImg.alt = `Gallery photo ${newIndex + 1}`;
+                currentIndex = newIndex;
+                updateCounter();
+                updateThumbActive();
+                scrollThumbIntoView(newIndex);
+                preload(newIndex - 1);
+                preload(newIndex + 1);
+
+                // Force reflow
+                void lbImg.offsetWidth;
+                lbImg.classList.remove(enterClass);
+
+                setTimeout(() => { isAnimating = false; }, 380);
+            }, 320);
+        }
+
+        function prevImage() {
+            if (currentIndex > 0) navigateTo(currentIndex - 1, 'prev');
+        }
+        function nextImage() {
+            if (currentIndex < PHOTO_FILES.length - 1) navigateTo(currentIndex + 1, 'next');
+        }
+
+        function updateCounter() {
+            lbCounter.textContent = `${currentIndex + 1} / ${PHOTO_FILES.length}`;
+        }
+
+        function updateThumbActive() {
+            document.querySelectorAll('.lb-thumb').forEach((t, i) => {
+                t.classList.toggle('active', i === currentIndex);
+            });
+        }
+
+        function scrollThumbIntoView(index) {
+            const thumbs = lbThumbs.querySelectorAll('.lb-thumb');
+            if (thumbs[index]) {
+                thumbs[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+        }
+
+        function preload(index) {
+            if (index < 0 || index >= PHOTO_FILES.length) return;
+            const img = new Image();
+            img.src = PHOTOS_DIR + PHOTO_FILES[index];
+        }
+
+        /* ----------------------------------------------------------------
+           EVENT LISTENERS
+        ---------------------------------------------------------------- */
+        lbClose.addEventListener('click', closeLightbox);
+        lbPrev.addEventListener('click', prevImage);
+        lbNext.addEventListener('click', nextImage);
+
+        // Close on backdrop click (not on image/controls)
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox || e.target.classList.contains('lightbox-inner')) {
+                closeLightbox();
+            }
+        });
+
+        // Keyboard — navigation + block save shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Block Ctrl+S (save), Ctrl+U (view source), Ctrl+A (select all)
+            // Also block F12 (DevTools) — note: browser-level F12 can't be fully prevented
+            const ctrl = e.ctrlKey || e.metaKey;
+            if (ctrl && ['s', 'u', 'a', 'p'].includes(e.key.toLowerCase())) {
+                e.preventDefault();
+                return;
+            }
+            if (lightboxOpen) {
+                switch (e.key) {
+                    case 'ArrowLeft':  e.preventDefault(); prevImage();     break;
+                    case 'ArrowRight': e.preventDefault(); nextImage();     break;
+                    case 'Escape':     e.preventDefault(); closeLightbox(); break;
+                }
+            }
+        });
+
+        // Touch / swipe
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        lightbox.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        lightbox.addEventListener('touchend', (e) => {
+            const dx = e.changedTouches[0].clientX - touchStartX;
+            const dy = e.changedTouches[0].clientY - touchStartY;
+            if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+                if (dx < 0) nextImage(); else prevImage();
+            }
+        });
+
+        /* Hamburger is handled by the dedicated IIFE below */
+
+        /* ----------------------------------------------------------------
+           INIT
+        ---------------------------------------------------------------- */
+        // Start load bar
+        loadBar.style.width = '5%';
+        buildGallery();
+
+        // If no images at all (empty array), hide bar immediately
+        if (!PHOTO_FILES.length) loadBar.style.opacity = '0';
+
+        /* ----------------------------------------------------------------
+           DOWNLOAD PROTECTION — Global event guards
+        ---------------------------------------------------------------- */
+        // Block right-click context menu on images
+        document.addEventListener('contextmenu', (e) => {
+            if (e.target.tagName === 'IMG' || e.target.id === 'lb-img-shield' || e.target.classList.contains('img-shield')) {
+                e.preventDefault();
+            }
+        });
+
+        // Block drag-start on images
+        document.addEventListener('dragstart', (e) => {
+            if (e.target.tagName === 'IMG') e.preventDefault();
+        });
+
+        // Block long-press context menu on mobile (touchstart hold)
+        let longPressTimer;
+        document.addEventListener('touchstart', (e) => {
+            if (e.target.tagName === 'IMG') {
+                longPressTimer = setTimeout(() => e.preventDefault(), 500);
+            }
+        }, { passive: false });
+        document.addEventListener('touchend', () => clearTimeout(longPressTimer));
+        document.addEventListener('touchmove', () => clearTimeout(longPressTimer));
+
+    })();
+
+    /* ================================================================
+       MOBILE HAMBURGER MENU
+       ================================================================ */
+    (function () {
+        const hamburger  = document.getElementById('nav-hamburger');
+        const mobileMenu = document.getElementById('mobile-nav-menu');
+        const backdrop   = document.getElementById('mobile-nav-backdrop');
+        const closeBar   = document.getElementById('mobile-nav-close-bar');
+        const mobileLinks = mobileMenu.querySelectorAll('a');
+
+        function openMenu() {
+            mobileMenu.classList.add('open');
+            backdrop.classList.add('active');
+            hamburger.classList.add('open');
+            hamburger.setAttribute('aria-expanded', 'true');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMenu() {
+            mobileMenu.classList.remove('open');
+            backdrop.classList.remove('active');
+            hamburger.classList.remove('open');
+            hamburger.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+        }
+
+        hamburger.addEventListener('click', () => {
+            mobileMenu.classList.contains('open') ? closeMenu() : openMenu();
+        });
+
+        // Close when any link is clicked
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', closeMenu);
+        });
+
+        // Close bar
+        closeBar.addEventListener('click', closeMenu);
+        closeBar.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); closeMenu(); }
+        });
+
+        // Backdrop click
+        backdrop.addEventListener('click', closeMenu);
+
+        // Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && mobileMenu.classList.contains('open')) closeMenu();
+        });
+    })();
+    </script>
+
+</body>
+</html>

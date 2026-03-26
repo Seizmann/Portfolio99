@@ -479,6 +479,25 @@
             box-shadow: 0 10px 40px rgba(0, 240, 255, 0.1);
         }
 
+        /* Featured Project Custom Animation/Styles */
+        .featured-project {
+            border: 1px solid rgba(0, 240, 255, 0.4);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+            animation: pulse-glow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite alternate;
+        }
+
+        .featured-project:hover {
+            transform: translateX(10px) scale(1.02);
+            border-color: rgba(0, 240, 255, 0.7);
+            box-shadow: 0 15px 50px rgba(0, 240, 255, 0.4);
+            z-index: 5;
+        }
+
+        @keyframes pulse-glow {
+            from { box-shadow: 0 0 15px rgba(0, 240, 255, 0.1); border-color: rgba(0, 240, 255, 0.3); }
+            to { box-shadow: 0 0 35px rgba(0, 240, 255, 0.6); border-color: rgba(0, 240, 255, 0.8); }
+        }
+
         .project-content {
             position: relative;
             z-index: 1;
@@ -803,6 +822,93 @@
             border-radius: 3px;
             box-shadow: 0 0 5px rgba(0, 240, 255, 0.5);
         }
+
+        /* Termination Modal */
+        #spritex-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        #spritex-modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        #spritex-modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 5, 8, 0.85);
+            backdrop-filter: blur(15px);
+        }
+
+        .modal-card {
+            position: relative;
+            z-index: 10;
+            background: var(--glass-bg);
+            border: 1px solid rgba(255, 0, 85, 0.3);
+            border-radius: 20px;
+            padding: 2.5rem;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            transform: scale(0.8) translateY(20px);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 40px rgba(255, 0, 85, 0.1);
+        }
+
+        #spritex-modal.active .modal-card {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-icon {
+            font-size: 3.5rem;
+            color: #ff0055;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 20px rgba(255, 0, 85, 0.4);
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .modal-text {
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .modal-btn {
+            background: rgba(255, 0, 85, 0.1);
+            color: #ff0055;
+            border: 1px solid #ff0055;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-btn:hover {
+            background: #ff0055;
+            color: white;
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.4);
+        }
     </style>
 </head>
 
@@ -961,11 +1067,31 @@
                 <h2 class="section-title">Notable Projects</h2>
                 <div class="projects-grid">
 
-                    <div class="project-card">
+                    <div class="project-card featured-project">
+                        <div class="project-content">
+                            <div class="project-title">
+                                SijanList
+                                <span class="project-status">Active</span>
+                            </div>
+                            <p>SijanList is a modern utility-based platform combined with a browser extension that allows users to manage and interact with digital content more efficiently. It integrates a web interface with extension-based functionality to provide a seamless user experience. The system includes real-time features, a structured backend, and a user-focused interface designed for performance and simplicity.</p>
+                            <div class="tech-stack">
+                                <span class="tech-tag">HTML</span>
+                                <span class="tech-tag">CSS</span>
+                                <span class="tech-tag">JavaScript</span>
+                                <span class="tech-tag">Supabase</span>
+                                <span class="tech-tag">Browser Extension APIs</span>
+                            </div>
+                            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                                <a href="https://sijanlist.pro.bd" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem;" target="_blank">View Project <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="project-card" style="border-color: rgba(255, 0, 85, 0.2);">
                         <div class="project-content">
                             <div class="project-title">
                                 Spritex Platform
-                                <span class="project-status">Active</span>
+                                <span class="project-status" style="background: rgba(255, 0, 85, 0.1); color: #ff0055; border-color: rgba(255, 0, 85, 0.3);">Terminated</span>
                             </div>
                             <p>An advanced digital platform spearheaded by Sijan. Focuses on delivering high-performance
                                 tools and services with a cutting-edge futuristic UI. Integrates intense dark mode
@@ -976,8 +1102,8 @@
                                 <span class="tech-tag">Tailwind CSS</span>
                                 <span class="tech-tag">Framer Motion</span>
                             </div>
-                            <a href="#" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">View
-                                Platform <i class="fas fa-arrow-right"></i></a>
+                            <button id="spritex-trigger" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem; --accent-cyan: #ff0055; border-color: #ff0055; color: #ff0055; background: rgba(255, 0, 85, 0.1);">View
+                                Platform <i class="fas fa-arrow-right"></i></button>
                         </div>
                     </div>
 
@@ -995,7 +1121,7 @@
                                 <span class="tech-tag">CSS3</span>
                                 <span class="tech-tag">JavaScript</span>
                             </div>
-                            <a href="#" class="btn btn-primary"
+                            <a href="/" class="btn btn-primary"
                                 style="padding: 0.5rem 1rem; font-size: 0.9rem; --accent-cyan: var(--accent-purple); box-shadow: 0 0 15px rgba(157, 0, 255, 0.2);">Explore
                                 Portfolio <i class="fas fa-arrow-right"></i></a>
                         </div>
@@ -1014,6 +1140,7 @@
                                 <span class="tech-tag">Vanilla JS</span>
                                 <span class="tech-tag">CSS Animations</span>
                             </div>
+                            <a href="https://salami.indevs.in" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem; --accent-cyan: #ff0055; border-color: #ff0055; color: #ff0055; background: rgba(255, 0, 85, 0.1);" target="_blank">View Project <i class="fas fa-arrow-right"></i></a>
                         </div>
                     </div>
 
@@ -1397,8 +1524,46 @@
             if (isMobile() && (!window.IntersectionObserver || isInfoboxVisible)) {
                 startMobileSlideshow();
             }
+
+            // --- Spritex Modal Logic ---
+            const spritexTrigger = document.getElementById('spritex-trigger');
+            const spritexModal = document.getElementById('spritex-modal');
+            const spritexModalClose = document.getElementById('spritex-modal-close');
+            const spritexModalOverlay = document.getElementById('spritex-modal-overlay');
+
+            if (spritexTrigger && spritexModal) {
+                spritexTrigger.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    spritexModal.classList.add('active');
+                    // Lock scrolling when modal is open
+                    lenis.stop();
+                });
+
+                const closeModal = () => {
+                    spritexModal.classList.remove('active');
+                    lenis.start();
+                };
+
+                spritexModalClose.addEventListener('click', closeModal);
+                spritexModalOverlay.addEventListener('click', closeModal);
+            }
         });
     </script>
+
+    <!-- Spritex Termination Modal -->
+    <div id="spritex-modal" aria-hidden="true">
+        <div id="spritex-modal-overlay"></div>
+        <div class="modal-card">
+            <div class="modal-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 class="modal-title">Platform Offline</h3>
+            <p class="modal-text">
+                The <strong>Spritex Platform</strong> has been officially terminated and closed as of <strong>November, 2025</strong>. We thank you for your support during its operational phase.
+            </p>
+            <button class="modal-btn" id="spritex-modal-close">Acknowledge</button>
+        </div>
+    </div>
 
     <!-- ============================================================ -->
     <!-- 3D PARTICLE BACKGROUND ENGINE                                 -->
